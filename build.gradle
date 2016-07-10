@@ -1,0 +1,21 @@
+plugins {
+  id "com.iadams.gradle-plugin-plugin" version "0.2"
+}
+
+group 'com.iadams.gradle'
+version '0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile 'com.openshift:openshift-restclient-java:4.0.5.Final'
+
+  testCompile 'org.spockframework:spock-core:1.0-groovy-2.4', {
+    exclude module: 'groovy-all'
+  }
+}
