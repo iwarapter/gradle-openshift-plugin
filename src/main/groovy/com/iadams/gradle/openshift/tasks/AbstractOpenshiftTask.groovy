@@ -1,5 +1,5 @@
 /*
- * Openshift Plugin
+ * Gradle Openshift Plugin
  * The MIT License (MIT)
  *
  * Copyright (c) 2016 Iain Adams
@@ -24,9 +24,10 @@
  */
 package com.iadams.gradle.openshift.tasks
 
-import com.openshift.restclient.ClientBuilder
-import com.openshift.restclient.IClient
-import com.openshift.restclient.authorization.TokenAuthorizationStrategy
+import io.fabric8.kubernetes.client.Config
+import io.fabric8.kubernetes.client.ConfigBuilder
+import io.fabric8.openshift.client.DefaultOpenShiftClient
+import io.fabric8.openshift.client.OpenShiftClient
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
@@ -39,7 +40,16 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
   @Input
   String token
 
-  IClient client;
+  @Input
+  String username
+
+  @Input
+  String password
+
+  @Input
+  String namespace
+
+  OpenShiftClient client;
 
   AbstractOpenshiftTask(String description) {
     this.description = description
@@ -58,10 +68,15 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
    * Initializes the client and performs a login preferring token > user/password
    */
   void performLogin() {
-    client = new ClientBuilder(getBaseUrl())
-//      .usingToken(getToken())
+    Config config = new ConfigBuilder()
+      .withMasterUrl(getBaseUrl())
+      .withNamespace(getNamespace())
+//      .withOauthToken(getToken())
+      .withUsername(getUsername())
+      .withPassword(getPassword())
       .build()
 
-    client.setAuthorizationStrategy(new TokenAuthorizationStrategy(getToken()))
+    client = new DefaultOpenShiftClient(config)
+    client.inNamespace(getNamespace())
   }
 }

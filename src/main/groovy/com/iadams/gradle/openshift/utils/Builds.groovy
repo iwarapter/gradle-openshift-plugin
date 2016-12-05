@@ -22,16 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.iadams.gradle.openshift.extensions
+package com.iadams.gradle.openshift.utils
 
-/**
- * @author iwarapter
- */
-class OpenshiftExtension {
+class Builds {
 
-  String baseUrl
+  public static class Status {
+    public static final String COMPLETE = "Complete";
+    public static final String FAIL = "Fail";
+    public static final String ERROR = "Error";
+    public static final String CANCELLED = "Cancelled";
+  }
 
-  String namespace
+  public static boolean isCompleted(String status) {
+    return Objects.equals(Status.COMPLETE, status);
+  }
 
+  public static boolean isCancelled(String status) {
+    return Objects.equals(Status.CANCELLED, status);
+  }
 
+  public static boolean isFailed(String status) {
+    if (status != null) {
+      return status.startsWith(Status.FAIL) || status.startsWith(Status.ERROR);
+    }
+    return false;
+  }
+
+  public static boolean isFinished(String status) {
+    return isCompleted(status) || isFailed(status) || isCancelled(status);
+  }
 }

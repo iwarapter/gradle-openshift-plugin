@@ -1,5 +1,5 @@
 /*
- * Openshift Plugin
+ * Gradle Openshift Plugin
  * The MIT License (MIT)
  *
  * Copyright (c) 2016 Iain Adams
@@ -26,11 +26,13 @@ package com.iadams.gradle.openshift
 
 import com.iadams.gradle.openshift.utils.OpenShiftBaseIntegSpec
 import org.gradle.testkit.runner.GradleRunner
+import spock.lang.Ignore
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
+  @Ignore
   def "we can list the pods in a given project/namespace"() {
     setup:
     buildFile << """
@@ -41,24 +43,67 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
             openshift {
               baseUrl = 'https://10.2.2.2:8443/'
               auth {
-                token = 'Jnz-WgdJON3yJ6qe9MUZmN3dwaooCVm7pKi5QEn3sHE'
+                token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
               }
             }
 
-            task listPods(type: com.iadams.gradle.openshift.tasks.ListPodsTask) {
+            task listPods(type: com.iadams.gradle.openshift.tasks.NewAppTask) {
               namespace = 'default'
+              deploymentConfig = new io.fabric8.openshift.api.model.DeploymentConfigBuilder().build()
             }
             """
 
     when:
     def result = GradleRunner.create()
       .withProjectDir(testProjectDir.root)
-      .withArguments('listPods')
+      .withArguments('listPods', '--s')
       .withPluginClasspath(pluginClasspath)
       .build()
 
     then:
     println result.output
     result.task(":listPods").outcome == SUCCESS
+  }
+
+  @Ignore
+  def "we can start a build and watch the logs"() {
+    setup:
+    buildFile << """
+            plugins {
+              id 'com.iadams.openshift'
+            }
+
+            openshift {
+              baseUrl = 'https://127.0.0.1:8443'
+              auth {
+                token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
+                username = 'developer'
+                password = 'developer'
+              }
+            }
+
+            task startBuild(type: com.iadams.gradle.openshift.tasks.StartBuildTask) {
+              namespace = 'myproject'
+              watch = true
+              buildConfig = 'test-app'
+              dockerTar = file('build/build.tar.gz')
+            }
+            """
+    copyResources('docker-build/build.tar.gz', 'build/build.tar.gz')
+
+    when:
+    def result = GradleRunner.create()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('startBuild', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .build()
+
+    then:
+    println result.output
+    result.task(":startBuild").outcome == SUCCESS
+    result.output.contains('Receiving source from STDIN as archive ...')
+    result.output.contains('Step 1 : FROM nginx')
+    result.output.contains('Step 2 : COPY index.html /usr/share/nginx/html')
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Openshift Plugin
+ * Gradle Openshift Plugin
  * The MIT License (MIT)
  *
  * Copyright (c) 2016 Iain Adams
@@ -22,13 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package com.iadams.gradle.openshift
 
-import com.openshift.restclient.ClientBuilder
-import com.openshift.restclient.IClient
-import com.openshift.restclient.ResourceKind
-import com.openshift.restclient.authorization.TokenAuthorizationStrategy
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
@@ -112,7 +107,7 @@ class OpenshiftPluginSpec extends Specification {
   def 'apply to multiple subprojects'() {
     def subprojectNames = ['sub1', 'sub2', 'sub3']
 
-    subprojectNames.each { subprojectName ->
+    subprojectNames.each {subprojectName ->
       def subproject = createSubproject(project, subprojectName)
       project.subprojects.add(subproject)
     }
@@ -120,8 +115,8 @@ class OpenshiftPluginSpec extends Specification {
     when:
     project.apply plugin: PLUGIN_ID
 
-    subprojectNames.each { subprojectName ->
-      def subproject = project.subprojects.find { it.name == subprojectName }
+    subprojectNames.each {subprojectName ->
+      def subproject = project.subprojects.find {it.name == subprojectName}
       subproject.apply plugin: PLUGIN_ID
     }
 

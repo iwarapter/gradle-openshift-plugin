@@ -22,16 +22,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.iadams.gradle.openshift.extensions
+package com.iadams.gradle.openshift.tasks
+
+import org.gradle.api.Project
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
+import spock.lang.Specification
 
 /**
  * @author iwarapter
  */
-class OpenshiftExtension {
+class AbstractOpenshiftTaskSpec extends Specification {
 
-  String baseUrl
+  static final String PLUGIN_ID = 'com.iadams.openshift'
+  Project project
 
-  String namespace
+  @Rule
+  TemporaryFolder projectDir
 
+  def setup() {
+    project = ProjectBuilder.builder().build()
+    project.pluginManager.apply PLUGIN_ID
+  }
 
+  def "PerformLogin"() {
+    when:
+    Example t = project.tasks.create('example', Example.class)
+    t.namespace = 'my-project'
+    t.baseUrl = 'https://my-site:8443'
+    t.token = '1a2b3c4d'
+
+    then:
+    t.performLogin()
+    t.client != null
+    t.client.openshiftUrl.toString() == 'https://my-site:8443/oapi/v1/'
+  }
+}
+
+class Example extends AbstractOpenshiftTask {
+
+  Example() {
+    super('Dummy task for testing')
+  }
+
+  @Override
+  void executeAction() {
+
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Openshift Plugin
+ * Gradle Openshift Plugin
  * The MIT License (MIT)
  *
  * Copyright (c) 2016 Iain Adams
@@ -44,10 +44,12 @@ class OpenshiftPlugin implements Plugin<Project> {
     OpenshiftExtension extension = project.extensions.create(OPENSHIFT_EXTENSION, OpenshiftExtension)
     extension.extensions.create(OPENSHIFT_AUTH_EXTENSION, AuthenticationExtension)
 
-    project.tasks.withType( AbstractOpenshiftTask ){
-      conventionMapping.baseUrl = { extension.baseUrl }
-      conventionMapping.token = { extension.auth.token }
-      conventionMapping.namespace = { extension.namespace }
+    project.tasks.withType(AbstractOpenshiftTask) {
+      conventionMapping.baseUrl = {extension.baseUrl}
+      conventionMapping.namespace = {extension.namespace}
+      conventionMapping.token = {extension.auth.token}
+      conventionMapping.username = {extension.auth.username}
+      conventionMapping.password = {extension.auth.password}
     }
   }
 }

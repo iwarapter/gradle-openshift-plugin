@@ -1,5 +1,5 @@
 /*
- * Openshift Plugin
+ * Gradle Openshift Plugin
  * The MIT License (MIT)
  *
  * Copyright (c) 2016 Iain Adams
@@ -49,6 +49,8 @@ class OpenShiftBaseIntegSpec extends Specification {
     pluginClasspath = pluginClasspathResource.readLines().collect {new File(it)}
 
     settingsFile = testProjectDir.newFile('settings.gradle')
+    settingsFile << "rootProject.name = 'example'"
+
   }
 
   /**

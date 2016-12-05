@@ -1,5 +1,5 @@
 /*
- * Openshift Plugin
+ * Gradle Openshift Plugin
  * The MIT License (MIT)
  *
  * Copyright (c) 2016 Iain Adams
@@ -24,8 +24,6 @@
  */
 package com.iadams.gradle.openshift.tasks
 
-import com.openshift.internal.restclient.model.Pod
-import com.openshift.restclient.ResourceKind
 import org.gradle.api.tasks.Input
 
 class ListPodsTask extends AbstractOpenshiftTask {
@@ -39,8 +37,11 @@ class ListPodsTask extends AbstractOpenshiftTask {
 
   @Override
   void executeAction() {
-    client.list(ResourceKind.POD, getNamespace()).each {
-      logger.lifecycle( ((Pod)it).toString())
+    client.pods().list().items.each {
+      logger.lifecycle(it.toString())
     }
+//    client.list(ResourceKind.POD, getNamespace()).each {
+//      logger.lifecycle( ((Pod)it).toString())
+//    }
   }
 }

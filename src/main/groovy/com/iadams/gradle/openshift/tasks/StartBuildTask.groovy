@@ -22,16 +22,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.iadams.gradle.openshift.extensions
+package com.iadams.gradle.openshift.tasks
 
-/**
- * @author iwarapter
- */
-class OpenshiftExtension {
+import io.fabric8.openshift.api.model.Build
+import io.fabric8.openshift.api.model.BuildConfig
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 
-  String baseUrl
+class StartBuildTask extends AbstractOpenshiftTask {
 
-  String namespace
+  @Input
+  String buildConfig
 
+  @InputFile
+  File dockerTar
 
+  @Input
+  @Optional
+  boolean watch = false
+
+  StartBuildTask() {
+    super('Starts a build for a given buildConfig')
+  }
+
+  @Override
+  void executeAction() {
+
+    //check build config exists
+    BuildConfig buildConfig = client.buildConfigs().withName(getBuildConfig()).get()
+
+    Build b = client.buildConfigs()
+      .withName(getBuildConfig())
+      .instantiateBinary()
+      .fromFile(getDockerTar())
+
+    if (watch) {
+      //TODO wait for build to finish
+    }
+  }
 }
