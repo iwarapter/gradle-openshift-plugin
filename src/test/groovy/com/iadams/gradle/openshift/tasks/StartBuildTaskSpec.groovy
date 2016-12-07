@@ -26,6 +26,7 @@ package com.iadams.gradle.openshift.tasks
 
 import io.fabric8.openshift.api.model.BuildBuilder
 import io.fabric8.openshift.api.model.BuildConfigBuilder
+import io.fabric8.openshift.api.model.ImageStreamBuilder
 import io.fabric8.openshift.client.mock.OpenShiftServer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -52,15 +53,46 @@ class StartBuildTaskSpec extends Specification {
   def "we can trigger a build"() {
     given:
     server.expect().withPath("/oapi/v1/namespaces/test/buildconfigs/test-app").andReturn(200, new BuildConfigBuilder()
-      .withNewMetadata().withName("test-app").endMetadata()
-      .build()).once()
+      .withNewMetadata().withName("test-app").endMetadata().build()).once()
+
+    server.expect().withPath("/oapi/v1/namespaces/test/imagestreams/test-app").andReturn(200, new ImageStreamBuilder()
+      .withNewMetadata().withName("test-app").endMetadata().build()).once()
+
     server.expect().withPath("/oapi/v1/namespaces/test/buildconfigs/test-app/instantiatebinary?commit=").andReturn(201, new BuildBuilder()
       .withNewMetadata().withName("bc2").endMetadata().build()).once()
 
     when:
     StartBuildTask t = project.tasks.create('example', StartBuildTask.class)
     t.client = server.getOpenshiftClient()
-    t.buildConfig = 'test-app'
+    t.namespace = 'test'
+    t.buildName = 'test-app'
+    t.watch = false
+    t.dockerTar = projectDir.newFile()
+
+    then:
+    t.executeAction()
+  }
+
+  def "we can trigger a build and create default imagestream and buildConfigs"() {
+    given:
+    server.expect().get().withPath("/oapi/v1/namespaces/test/buildconfigs/test-app").andReturn(200, null).once()
+
+    server.expect().post().withPath("/oapi/v1/namespaces/test/buildconfigs").andReturn(201, new BuildConfigBuilder()
+      .withNewMetadata().withName("test-app").endMetadata().build()).once()
+
+    server.expect().get().withPath("/oapi/v1/namespaces/test/imagestreams/test-app").andReturn(200, null).once()
+
+    server.expect().post().withPath("/oapi/v1/namespaces/test/imagestreams").andReturn(201, new ImageStreamBuilder()
+      .withNewMetadata().withName("test-app").endMetadata().build()).once()
+
+    server.expect().withPath("/oapi/v1/namespaces/test/buildconfigs/test-app/instantiatebinary?commit=").andReturn(201, new BuildBuilder()
+      .withNewMetadata().withName("bc2").endMetadata().build()).once()
+
+    when:
+    StartBuildTask t = project.tasks.create('example', StartBuildTask.class)
+    t.client = server.getOpenshiftClient()
+    t.namespace = 'test'
+    t.buildName = 'test-app'
     t.watch = false
     t.dockerTar = projectDir.newFile()
 

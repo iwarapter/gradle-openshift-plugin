@@ -65,6 +65,46 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     result.task(":listPods").outcome == SUCCESS
   }
 
+  def "we can start a build"() {
+    setup:
+    buildFile << """
+            plugins {
+              id 'com.iadams.openshift'
+            }
+
+            group = 'com.example'
+            version = '0.1'
+
+            openshift {
+              baseUrl = 'https://127.0.0.1:8443'
+              auth {
+                token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
+                username = 'developer'
+                password = 'developer'
+              }
+            }
+
+            task startBuild(type: com.iadams.gradle.openshift.tasks.StartBuildTask) {
+              namespace = 'myproject'
+              buildName = 'test-app'
+              dockerTar = file('build/build.tar.gz')
+            }
+            """
+    copyResources('docker-build/build.tar.gz', 'build/build.tar.gz')
+
+    when:
+    def result = GradleRunner.create()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('startBuild', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .build()
+
+    then:
+    println result.output
+    result.task(":startBuild").outcome == SUCCESS
+  }
+
   @Ignore
   def "we can start a build and watch the logs"() {
     setup:
@@ -85,7 +125,7 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
             task startBuild(type: com.iadams.gradle.openshift.tasks.StartBuildTask) {
               namespace = 'myproject'
               watch = true
-              buildConfig = 'test-app'
+              buildName = 'test-app'
               dockerTar = file('build/build.tar.gz')
             }
             """
