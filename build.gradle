@@ -13,11 +13,11 @@ repositories {
 }
 
 dependencies {
-  compile 'io.fabric8:openshift-client:1.4.26'
+  compile 'io.fabric8:openshift-client:2.0.6'
 
   testCompile 'commons-io:commons-io:2.4'
-  testCompile 'io.fabric8:kubernetes-client:1.4.26:tests'
-  testCompile 'io.fabric8:openshift-client:1.4.26:tests'
+  testCompile 'io.fabric8:kubernetes-client:2.0.6:tests'
+  testCompile 'io.fabric8:openshift-client:2.0.6:tests'
   testCompile 'io.fabric8:mockwebserver:0.0.4'
 
   testCompile 'org.spockframework:spock-core:1.0-groovy-2.4', {
@@ -25,9 +25,18 @@ dependencies {
   }
 }
 
-tasks.withType(org.gradle.api.tasks.testing.Test) {
+tasks.withType(Test) {
   testLogging {
-    events "failed"
+    events "failed", "passed", "skipped"
     exceptionFormat "full"
   }
 }
+
+task integTestTarBall(type: Tar) {
+  from files('src/integTest/resources/docker-build/Dockerfile', 'src/integTest/resources/docker-build/index.html')
+  destinationDir = file('src/integTest/resources/docker-build')
+  archiveName = 'build.tar.gz'
+  compression = Compression.GZIP
+}
+
+processIntegTestResources.dependsOn integTestTarBall

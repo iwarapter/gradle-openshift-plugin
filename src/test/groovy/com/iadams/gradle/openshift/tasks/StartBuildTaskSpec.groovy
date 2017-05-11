@@ -73,7 +73,7 @@ class StartBuildTaskSpec extends Specification {
     t.executeAction()
   }
 
-  def "we can trigger a build and create default imagestream and buildConfigs"() {
+  def "we can trigger a build and create default imageStream and buildConfigs"() {
     given:
     server.expect().get().withPath("/oapi/v1/namespaces/test/buildconfigs/test-app").andReturn(200, null).once()
 

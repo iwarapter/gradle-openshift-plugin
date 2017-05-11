@@ -41,9 +41,11 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
             }
 
             openshift {
-              baseUrl = 'https://10.2.2.2:8443/'
+              baseUrl = 'https://127.0.0.1:8443'
               auth {
                 token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
+                username = 'developer'
+                password = 'developer'
               }
             }
 
@@ -105,7 +107,6 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     result.task(":startBuild").outcome == SUCCESS
   }
 
-  @Ignore
   def "we can start a build and watch the logs"() {
     setup:
     buildFile << """
@@ -143,7 +144,7 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     println result.output
     result.task(":startBuild").outcome == SUCCESS
     result.output.contains('Receiving source from STDIN as archive ...')
-    result.output.contains('Step 1 : FROM nginx')
-    result.output.contains('Step 2 : COPY index.html /usr/share/nginx/html')
+    result.output.contains('Step 1/4 : FROM nginx')
+    result.output.contains('Step 2/4 : COPY index.html /')
   }
 }

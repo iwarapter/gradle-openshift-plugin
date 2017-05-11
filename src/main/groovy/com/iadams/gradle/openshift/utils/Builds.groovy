@@ -26,29 +26,29 @@ package com.iadams.gradle.openshift.utils
 
 class Builds {
 
-  public static class Status {
-    public static final String COMPLETE = "Complete";
-    public static final String FAIL = "Fail";
-    public static final String ERROR = "Error";
-    public static final String CANCELLED = "Cancelled";
+  static class Status {
+    public static final String COMPLETE = "Complete"
+    public static final String FAIL = "Fail"
+    public static final String ERROR = "Error"
+    public static final String CANCELLED = "Cancelled"
   }
 
-  public static boolean isCompleted(String status) {
-    return Objects.equals(Status.COMPLETE, status);
+  static boolean isCompleted(String status) {
+    return Objects.equals(Status.COMPLETE, status)
   }
 
-  public static boolean isCancelled(String status) {
-    return Objects.equals(Status.CANCELLED, status);
+  static boolean isCancelled(String status) {
+    return Objects.equals(Status.CANCELLED, status)
   }
 
-  public static boolean isFailed(String status) {
+  static boolean isFailed(String status) {
     if (status != null) {
-      return status.startsWith(Status.FAIL) || status.startsWith(Status.ERROR);
+      return status.startsWith(Status.FAIL) || status.startsWith(Status.ERROR)
     }
-    return false;
+    return false
   }
 
-  public static boolean isFinished(String status) {
-    return isCompleted(status) || isFailed(status) || isCancelled(status);
+  static boolean isFinished(String status) {
+    return isCompleted(status) || isFailed(status) || isCancelled(status)
   }
 }

@@ -30,6 +30,7 @@ import io.fabric8.openshift.client.DefaultOpenShiftClient
 import io.fabric8.openshift.client.OpenShiftClient
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 abstract class AbstractOpenshiftTask extends DefaultTask {
@@ -49,7 +50,8 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
   @Input
   String namespace
 
-  OpenShiftClient client;
+  @Internal
+  OpenShiftClient client
 
   AbstractOpenshiftTask(String description) {
     this.description = description
@@ -60,6 +62,7 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
   void start() {
     performLogin()
     executeAction()
+    client.close()
   }
 
   abstract void executeAction()

@@ -1,0 +1,24 @@
+sudo: required
+
+language:
+  - bash
+
+services:
+  - docker
+
+before_install:
+  # openshift
+  - sudo apt-get install wget -y
+  - sudo sed -i 's:DOCKER_OPTS=":DOCKER_OPTS="--insecure-registry 172.30.0.0/16 :g' /etc/default/docker
+  - sudo mv /bin/findmnt /bin/findmnt.backup
+  - sudo cat /etc/default/docker
+  - sudo /etc/init.d/docker restart
+  - wget https://github.com/openshift/origin/releases/download/v1.4.1/openshift-origin-client-tools-v1.4.1-3f9807a-linux-64bit.tar.gz -O /tmp/oc.tar.gz
+  - mkdir /tmp/ocdir && cd /tmp/ocdir && tar -xvvf /tmp/oc.tar.gz
+  - sudo mv /tmp/ocdir/*/oc /usr/bin/
+
+script:
+  # run tests
+  - docker version
+  - oc version
+  - oc cluster up

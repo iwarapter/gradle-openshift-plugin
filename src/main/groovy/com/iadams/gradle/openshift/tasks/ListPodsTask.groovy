@@ -40,8 +40,5 @@ class ListPodsTask extends AbstractOpenshiftTask {
     client.pods().list().items.each {
       logger.lifecycle(it.toString())
     }
-//    client.list(ResourceKind.POD, getNamespace()).each {
-//      logger.lifecycle( ((Pod)it).toString())
-//    }
   }
 }
