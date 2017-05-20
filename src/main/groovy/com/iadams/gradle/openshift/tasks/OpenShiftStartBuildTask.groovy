@@ -40,7 +40,7 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 
-class StartBuildTask extends AbstractOpenshiftTask {
+class OpenShiftStartBuildTask extends AbstractOpenshiftTask {
 
   @Input
   String buildName
@@ -59,7 +59,7 @@ class StartBuildTask extends AbstractOpenshiftTask {
   @Internal
   String lastBuildStatus
 
-  StartBuildTask() {
+    OpenShiftStartBuildTask() {
     super('Starts a build for a given deploymentConfigName')
   }
 

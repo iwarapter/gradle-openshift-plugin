@@ -24,10 +24,10 @@
  */
 package com.iadams.gradle.openshift.tasks
 
-import io.fabric8.kubernetes.api.model.PodBuilder
-import io.fabric8.kubernetes.api.model.PodListBuilder
+import io.fabric8.openshift.api.model.BuildBuilder
 import io.fabric8.openshift.api.model.BuildConfigBuilder
-import io.fabric8.openshift.client.OpenShiftClient
+import io.fabric8.openshift.api.model.ImageStreamBuilder
+import io.fabric8.openshift.api.model.ImageStreamTagBuilder
 import io.fabric8.openshift.client.mock.OpenShiftServer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -35,10 +35,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-/**
- * @author iwarapter
- */
-class ListPodsTaskSpec extends Specification {
+class OpenShiftTagTaskSpec extends Specification {
 
   static final String PLUGIN_ID = 'com.iadams.openshift'
   Project project
@@ -46,23 +43,29 @@ class ListPodsTaskSpec extends Specification {
   @Rule
   TemporaryFolder projectDir
 
-  @Rule
-  public OpenShiftServer server = new OpenShiftServer()
-
   def setup() {
     project = ProjectBuilder.builder().build()
     project.pluginManager.apply PLUGIN_ID
   }
 
-  def "we can list the pods in a given namespace"() {
+  @Rule
+  public OpenShiftServer server = new OpenShiftServer()
+
+  def "we can trigger a build"() {
     given:
-    server.expect().withPath("/api/v1/namespaces/test/pods").andReturn(200, new PodListBuilder().build()).once()
+    server.expect().post().withPath("/oapi/v1/namespaces/test/imagestreamtags").andReturn(200, new ImageStreamTagBuilder()
+      .build()).once()
 
     when:
-    ListPodsTask t = project.tasks.create('example', ListPodsTask.class)
+    OpenShiftTagTask t = project.tasks.create('example', OpenShiftTagTask.class)
     t.client = server.getOpenshiftClient()
+    t.namespace = 'test'
+    t.imageName = 'test-app'
+    t.tag = '0.1'
+
+    t.executeAction()
 
     then:
-    t.executeAction()
+    server.getMockServer().takeRequest()
   }
 }

@@ -62,7 +62,7 @@ class StartBuildTaskSpec extends Specification {
       .withNewMetadata().withName("bc2").endMetadata().build()).once()
 
     when:
-    StartBuildTask t = project.tasks.create('example', StartBuildTask.class)
+    OpenShiftStartBuildTask t = project.tasks.create('example', OpenShiftStartBuildTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
     t.buildName = 'test-app'
@@ -89,7 +89,7 @@ class StartBuildTaskSpec extends Specification {
       .withNewMetadata().withName("bc2").endMetadata().build()).once()
 
     when:
-    StartBuildTask t = project.tasks.create('example', StartBuildTask.class)
+    OpenShiftStartBuildTask t = project.tasks.create('example', OpenShiftStartBuildTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
     t.buildName = 'test-app'

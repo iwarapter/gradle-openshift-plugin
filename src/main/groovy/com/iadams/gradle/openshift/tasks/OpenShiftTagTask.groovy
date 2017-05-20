@@ -26,19 +26,27 @@ package com.iadams.gradle.openshift.tasks
 
 import org.gradle.api.tasks.Input
 
-class ListPodsTask extends AbstractOpenshiftTask {
+class OpenShiftTagTask extends AbstractOpenshiftTask {
 
   @Input
-  String namespace
+  String imageName
 
-  ListPodsTask() {
-    super('Lists all the pods on the project.')
+  @Input
+  String tag
+
+  OpenShiftTagTask() {
+    super('Tag existing images into image streams')
   }
 
   @Override
   void executeAction() {
-    client.pods().list().items.each {
-      logger.lifecycle(it.toString())
-    }
+    client.imageStreamTags().createNew()
+      .withNewMetadata()
+      .withName("${getImageName()}:${getTag()}")
+      .and()
+      .withNewTag().withNewFrom().withKind('DockerImage').withName("${getImageName()}:latest")
+      .and()
+      .and()
+      .done()
   }
 }

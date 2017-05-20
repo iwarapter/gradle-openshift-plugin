@@ -32,41 +32,6 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
-  @Ignore
-  def "we can list the pods in a given project/namespace"() {
-    setup:
-    buildFile << """
-            plugins {
-              id 'com.iadams.openshift'
-            }
-
-            openshift {
-              baseUrl = 'https://127.0.0.1:8443'
-              auth {
-                token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
-                username = 'developer'
-                password = 'developer'
-              }
-            }
-
-            task listPods(type: com.iadams.gradle.openshift.tasks.NewAppTask) {
-              namespace = 'default'
-              deploymentConfig = new io.fabric8.openshift.api.model.DeploymentConfigBuilder().build()
-            }
-            """
-
-    when:
-    def result = GradleRunner.create()
-      .withProjectDir(testProjectDir.root)
-      .withArguments('listPods', '--s')
-      .withPluginClasspath(pluginClasspath)
-      .build()
-
-    then:
-    println result.output
-    result.task(":listPods").outcome == SUCCESS
-  }
-
   def "we can start a build"() {
     setup:
     buildFile << """
@@ -86,7 +51,7 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
               }
             }
 
-            task startBuild(type: com.iadams.gradle.openshift.tasks.StartBuildTask) {
+            task startBuild(type: com.iadams.gradle.openshift.tasks.OpenShiftStartBuildTask) {
               namespace = 'myproject'
               buildName = 'test-app'
               dockerTar = file('build/build.tar.gz')
@@ -123,7 +88,7 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
               }
             }
 
-            task startBuild(type: com.iadams.gradle.openshift.tasks.StartBuildTask) {
+            task startBuild(type: com.iadams.gradle.openshift.tasks.OpenShiftStartBuildTask) {
               namespace = 'myproject'
               watch = true
               buildName = 'test-app'
@@ -146,5 +111,44 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     result.output.contains('Receiving source from STDIN as archive ...')
     result.output.contains('Step 1/4 : FROM nginx')
     result.output.contains('Step 2/4 : COPY index.html /')
+  }
+
+  def "we can tag a built image"() {
+    setup:
+    buildFile << """
+            plugins {
+              id 'com.iadams.openshift'
+            }
+
+            group = 'com.example'
+            version = '0.1'
+
+            openshift {
+              baseUrl = 'https://127.0.0.1:8443'
+              auth {
+                token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
+                username = 'developer'
+                password = 'developer'
+              }
+            }
+
+            task tagBuild(type: com.iadams.gradle.openshift.tasks.OpenShiftTagTask) {
+              namespace = 'myproject'
+              imageName = 'test-app'
+              tag = version
+            }
+            """
+
+    when:
+    def result = GradleRunner.create()
+            .withProjectDir(testProjectDir.root)
+            .withArguments('tagBuild', '--i', '--s')
+            .withPluginClasspath(pluginClasspath)
+            .withDebug(true)
+            .build()
+
+    then:
+    println result.output
+    result.task(":tagBuild").outcome == SUCCESS
   }
 }
