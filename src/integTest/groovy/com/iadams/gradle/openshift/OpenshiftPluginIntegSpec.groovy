@@ -27,29 +27,17 @@ package com.iadams.gradle.openshift
 import com.iadams.gradle.openshift.utils.OpenShiftBaseIntegSpec
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Ignore
+import spock.lang.Stepwise
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
+@Stepwise
 class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
   def "we can start a build"() {
     setup:
     buildFile << """
-            plugins {
-              id 'com.iadams.openshift'
-            }
-
-            group = 'com.example'
-            version = '0.1'
-
-            openshift {
-              baseUrl = 'https://127.0.0.1:8443'
-              auth {
-                token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
-                username = 'developer'
-                password = 'developer'
-              }
-            }
+            ${basicBuildScript()}
 
             task startBuild(type: com.iadams.gradle.openshift.tasks.OpenShiftStartBuildTask) {
               namespace = 'myproject'
@@ -75,18 +63,7 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
   def "we can start a build and watch the logs"() {
     setup:
     buildFile << """
-            plugins {
-              id 'com.iadams.openshift'
-            }
-
-            openshift {
-              baseUrl = 'https://127.0.0.1:8443'
-              auth {
-                token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
-                username = 'developer'
-                password = 'developer'
-              }
-            }
+            ${basicBuildScript()}
 
             task startBuild(type: com.iadams.gradle.openshift.tasks.OpenShiftStartBuildTask) {
               namespace = 'myproject'
@@ -116,21 +93,7 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
   def "we can tag a built image"() {
     setup:
     buildFile << """
-            plugins {
-              id 'com.iadams.openshift'
-            }
-
-            group = 'com.example'
-            version = '0.1'
-
-            openshift {
-              baseUrl = 'https://127.0.0.1:8443'
-              auth {
-                token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
-                username = 'developer'
-                password = 'developer'
-              }
-            }
+            ${basicBuildScript()}
 
             task tagBuild(type: com.iadams.gradle.openshift.tasks.OpenShiftTagTask) {
               namespace = 'myproject'
@@ -150,5 +113,47 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     then:
     println result.output
     result.task(":tagBuild").outcome == SUCCESS
+  }
+
+  def "we can deploy our image"(){
+    setup:
+    buildFile << """
+            ${basicBuildScript()}
+
+            task deploy(type: com.iadams.gradle.openshift.tasks.OpenShiftStartDeploymentTask) {
+              namespace = 'myproject'
+              deployment = 'test-app'
+            }
+            """
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withArguments('deploy', '--i', '--s')
+        .withPluginClasspath(pluginClasspath)
+        .withDebug(true)
+        .build()
+
+    then:
+    println result.output
+    result.task(":deploy").outcome == SUCCESS
+  }
+
+  def basicBuildScript(){
+    """ plugins {
+          id 'com.iadams.openshift'
+        }
+
+        group = 'com.example'
+        version = '0.1'
+
+        openshift {
+          baseUrl = 'https://127.0.0.1:8443'
+          auth {
+            token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
+            username = 'developer'
+            password = 'developer'
+          }
+        }"""
   }
 }

@@ -26,27 +26,17 @@ package com.iadams.gradle.openshift.tasks
 
 import org.gradle.api.tasks.Input
 
-class OpenShiftTagTask extends AbstractOpenshiftTask {
+class OpenShiftStartDeploymentTask extends AbstractOpenshiftTask {
 
   @Input
-  String imageName
+  String deployment
 
-  @Input
-  String tag
-
-  OpenShiftTagTask() {
-    super('Tag existing images into image streams')
+  OpenShiftStartDeploymentTask() {
+    super('Trigger the latest deployment')
   }
 
   @Override
   void executeAction() {
-    client.imageStreamTags().createOrReplaceWithNew()
-      .withNewMetadata()
-      .withName("${getImageName()}:${getTag()}")
-      .and()
-      .withNewTag().withNewFrom().withKind('DockerImage').withName("${getImageName()}:latest")
-      .and()
-      .and()
-      .done()
+    client.deploymentConfigs().inNamespace(getNamespace()).withName(getDeployment()).deployLatest()
   }
 }

@@ -24,6 +24,7 @@
  */
 package com.iadams.gradle.openshift.tasks
 
+import io.fabric8.openshift.api.model.DeploymentConfigBuilder
 import io.fabric8.openshift.api.model.ImageStreamTagBuilder
 import io.fabric8.openshift.client.mock.OpenShiftServer
 import org.gradle.api.Project
@@ -32,8 +33,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-class OpenShiftTagTaskSpec extends Specification {
-
+class OpenShiftStartDeploymentTaskSpec extends Specification {
   static final String PLUGIN_ID = 'com.iadams.openshift'
   Project project
 
@@ -41,29 +41,31 @@ class OpenShiftTagTaskSpec extends Specification {
   TemporaryFolder projectDir
 
   def setup() {
-    project = ProjectBuilder.builder().build()
-    project.pluginManager.apply PLUGIN_ID
+      project = ProjectBuilder.builder().build()
+      project.pluginManager.apply PLUGIN_ID
   }
 
   @Rule
   public OpenShiftServer server = new OpenShiftServer()
 
-  def "we can tag an imagestream"() {
+  def "we can trigger the latest deployment"(){
     given:
-    server.expect().post().withPath("/oapi/v1/namespaces/test/imagestreamtags").andReturn(200, new ImageStreamTagBuilder()
-      .build()).once()
+    server.expect().get().withPath("/oapi/v1/namespaces/test/deploymentconfigs/test-app").andReturn(200, new DeploymentConfigBuilder()
+        .withNewMetadata().withName('test-app').endMetadata().withNewStatus().withLatestVersion(0L).endStatus().build()).once()
+    server.expect().get().withPath("/oapi/v1/namespaces/test/deploymentconfigs/test-app").andReturn(200, new DeploymentConfigBuilder()
+        .withNewMetadata().withName('test-app').endMetadata().withNewStatus().withLatestVersion(0L).endStatus().build()).once()
+    server.expect().post().withPath("/oapi/v1/namespaces/test/deploymentconfigs").andReturn(200, new ImageStreamTagBuilder()
+        .build()).once()
 
     when:
-    OpenShiftTagTask t = project.tasks.create('example', OpenShiftTagTask.class)
+    OpenShiftStartDeploymentTask t = project.tasks.create('example', OpenShiftStartDeploymentTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
-    t.imageName = 'test-app'
-    t.tag = '0.1'
+    t.deployment = 'test-app'
 
     t.executeAction()
 
     then:
-    noExceptionThrown()
     server.getMockServer().takeRequest()
   }
 }
