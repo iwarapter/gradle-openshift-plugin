@@ -33,7 +33,7 @@ tasks.withType(Test) {
 }
 
 task integTestTarBall(type: Tar) {
-  from files('src/integTest/resources/docker-build/Dockerfile', 'src/integTest/resources/docker-build/index.html')
+  from files('src/integTest/resources/docker-build/Dockerfile', 'src/integTest/resources/docker-build/server.js')
   destinationDir = file('src/integTest/resources/docker-build')
   archiveName = 'build.tar.gz'
   compression = Compression.GZIP
