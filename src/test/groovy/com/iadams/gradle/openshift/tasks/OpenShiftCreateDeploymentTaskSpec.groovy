@@ -24,7 +24,8 @@
  */
 package com.iadams.gradle.openshift.tasks
 
-import io.fabric8.openshift.api.model.ImageStreamTagBuilder
+import groovy.json.JsonSlurper
+import io.fabric8.openshift.api.model.DeploymentConfigBuilder
 import io.fabric8.openshift.client.server.mock.OpenShiftServer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -32,8 +33,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-class OpenShiftTagTaskSpec extends Specification {
-
+class OpenShiftCreateDeploymentTaskSpec extends Specification {
   static final String PLUGIN_ID = 'com.iadams.openshift'
   Project project
 
@@ -41,29 +41,32 @@ class OpenShiftTagTaskSpec extends Specification {
   TemporaryFolder projectDir
 
   def setup() {
-    project = ProjectBuilder.builder().build()
-    project.pluginManager.apply PLUGIN_ID
+      project = ProjectBuilder.builder().build()
+      project.pluginManager.apply PLUGIN_ID
   }
 
   @Rule
   public OpenShiftServer server = new OpenShiftServer()
 
-  def "we can tag an imagestream"() {
+  def "we can create a deployment"(){
     given:
-    server.expect().post().withPath("/oapi/v1/namespaces/test/imagestreamtags").andReturn(200, new ImageStreamTagBuilder()
-      .build()).once()
+    server.expect().post().withPath("/oapi/v1/namespaces/test/deploymentconfigs").andReturn(200, new DeploymentConfigBuilder()
+        .build()).once()
 
     when:
-    OpenShiftTagTask t = project.tasks.create('example', OpenShiftTagTask.class)
+    OpenShiftCreateDeploymentTask t = project.tasks.create('example', OpenShiftCreateDeploymentTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
-    t.imageName = 'test-app'
-    t.tag = '0.1'
+    t.deployment = new DeploymentConfigBuilder().withNewMetadata().withName('my-deployment').endMetadata().build()
 
     t.executeAction()
 
     then:
-    noExceptionThrown()
-    server.getMockServer().takeRequest()
+    server.getMockServer().requestCount == 2
+    server.mockServer.takeRequest()
+    Object result = new JsonSlurper().parseText(server.mockServer.takeRequest().getBody().readUtf8())
+
+    result.kind == 'DeploymentConfig'
+    result.metadata.name == 'my-deployment'
   }
 }

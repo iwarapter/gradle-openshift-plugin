@@ -24,46 +24,33 @@
  */
 package com.iadams.gradle.openshift.tasks
 
-import io.fabric8.openshift.api.model.ImageStreamTagBuilder
-import io.fabric8.openshift.client.server.mock.OpenShiftServer
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
-import spock.lang.Specification
+import io.fabric8.openshift.api.model.DeploymentConfig
+import org.gradle.api.GradleScriptException
+import org.gradle.api.tasks.Input
 
-class OpenShiftTagTaskSpec extends Specification {
+class OpenShiftCreateDeploymentTask extends AbstractOpenshiftTask {
 
-  static final String PLUGIN_ID = 'com.iadams.openshift'
-  Project project
+  @Input
+  def deployment
 
-  @Rule
-  TemporaryFolder projectDir
-
-  def setup() {
-    project = ProjectBuilder.builder().build()
-    project.pluginManager.apply PLUGIN_ID
+  OpenShiftCreateDeploymentTask() {
+    super('Trigger the latest deployment')
   }
 
-  @Rule
-  public OpenShiftServer server = new OpenShiftServer()
-
-  def "we can tag an imagestream"() {
-    given:
-    server.expect().post().withPath("/oapi/v1/namespaces/test/imagestreamtags").andReturn(200, new ImageStreamTagBuilder()
-      .build()).once()
-
-    when:
-    OpenShiftTagTask t = project.tasks.create('example', OpenShiftTagTask.class)
-    t.client = server.getOpenshiftClient()
-    t.namespace = 'test'
-    t.imageName = 'test-app'
-    t.tag = '0.1'
-
-    t.executeAction()
-
-    then:
-    noExceptionThrown()
-    server.getMockServer().takeRequest()
+  @Override
+  void executeAction() {
+    switch (deployment) {
+      case File:
+        File f = (File) getDeployment()
+        client.load(f.newInputStream()).createOrReplace()
+        break
+      case DeploymentConfig:
+        DeploymentConfig dc = (DeploymentConfig)getDeployment()
+        client.deploymentConfigs().inNamespace(getNamespace()).createOrReplace(dc)
+        break
+      default:
+        throw new GradleScriptException("Unable to create deployment with object ${getDeployment().class}")
+        break
+    }
   }
 }

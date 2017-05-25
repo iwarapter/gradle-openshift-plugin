@@ -27,7 +27,7 @@ package com.iadams.gradle.openshift.tasks
 import io.fabric8.openshift.api.model.BuildBuilder
 import io.fabric8.openshift.api.model.BuildConfigBuilder
 import io.fabric8.openshift.api.model.ImageStreamBuilder
-import io.fabric8.openshift.client.mock.OpenShiftServer
+import io.fabric8.openshift.client.server.mock.OpenShiftServer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule

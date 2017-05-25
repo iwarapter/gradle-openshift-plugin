@@ -25,8 +25,7 @@
 package com.iadams.gradle.openshift.tasks
 
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder
-import io.fabric8.openshift.api.model.ImageStreamTagBuilder
-import io.fabric8.openshift.client.mock.OpenShiftServer
+import io.fabric8.openshift.client.server.mock.OpenShiftServer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
@@ -53,9 +52,11 @@ class OpenShiftStartDeploymentTaskSpec extends Specification {
     server.expect().get().withPath("/oapi/v1/namespaces/test/deploymentconfigs/test-app").andReturn(200, new DeploymentConfigBuilder()
         .withNewMetadata().withName('test-app').endMetadata().withNewStatus().withLatestVersion(0L).endStatus().build()).once()
     server.expect().get().withPath("/oapi/v1/namespaces/test/deploymentconfigs/test-app").andReturn(200, new DeploymentConfigBuilder()
-        .withNewMetadata().withName('test-app').endMetadata().withNewStatus().withLatestVersion(0L).endStatus().build()).once()
-    server.expect().post().withPath("/oapi/v1/namespaces/test/deploymentconfigs").andReturn(200, new ImageStreamTagBuilder()
-        .build()).once()
+        .withNewMetadata().withName('test-app').endMetadata().withNewSpec().withReplicas(1).endSpec().withNewStatus().withLatestVersion(0L).endStatus().build()).times(2)
+    server.expect().patch().withPath("/oapi/v1/namespaces/test/deploymentconfigs/test-app").andReturn(200, new DeploymentConfigBuilder()
+        .withNewMetadata().withName('test-app').endMetadata().withNewSpec().withReplicas(1).endSpec().withNewStatus().withLatestVersion(1L).endStatus().build()).once()
+    server.expect().get().withPath("/oapi/v1/namespaces/test/deploymentconfigs/test-app").andReturn(200, new DeploymentConfigBuilder()
+        .withNewMetadata().withName('test-app').withGeneration(0L).endMetadata().withNewSpec().withReplicas(1).endSpec().withNewStatus().withReplicas(1).withObservedGeneration(1L).withLatestVersion(1L).endStatus().build()).times(2)
 
     when:
     OpenShiftStartDeploymentTask t = project.tasks.create('example', OpenShiftStartDeploymentTask.class)
@@ -66,6 +67,6 @@ class OpenShiftStartDeploymentTaskSpec extends Specification {
     t.executeAction()
 
     then:
-    server.getMockServer().takeRequest()
+    server.mockServer.requestCount == 6
   }
 }

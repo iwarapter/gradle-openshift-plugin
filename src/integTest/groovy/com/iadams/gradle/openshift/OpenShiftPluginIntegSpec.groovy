@@ -25,14 +25,33 @@
 package com.iadams.gradle.openshift
 
 import com.iadams.gradle.openshift.utils.OpenShiftBaseIntegSpec
+import io.fabric8.kubernetes.api.model.Service
+import io.fabric8.kubernetes.client.Config
+import io.fabric8.kubernetes.client.ConfigBuilder
+import io.fabric8.openshift.client.DefaultOpenShiftClient
+import io.fabric8.openshift.client.OpenShiftClient
 import org.gradle.testkit.runner.GradleRunner
-import spock.lang.Ignore
 import spock.lang.Stepwise
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 @Stepwise
-class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
+class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
+
+  String registryUrl = ''
+
+  def setup(){
+    Config config = new ConfigBuilder()
+        .withMasterUrl('https://127.0.0.1:8443')
+        .withUsername('developer').withPassword('developer')
+        .withNamespace('default')
+        .build()
+
+    OpenShiftClient client = new DefaultOpenShiftClient(config)
+    Service svc = client.services().inNamespace('default').withName('docker-registry').get()
+    registryUrl = "${svc.spec.clusterIP}:${svc.spec.ports[0].targetPort.intVal}"
+    client.close()
+  }
 
   def "we can start a build"() {
     setup:
@@ -86,7 +105,7 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     println result.output
     result.task(":startBuild").outcome == SUCCESS
     result.output.contains('Receiving source from STDIN as archive ...')
-    result.output.contains('Step 1/5 : FROM node:6.9.2')
+    result.output.contains('Step 1/5 : FROM node:6.10.3-alpine')
     result.output.contains('Step 2/5 : EXPOSE 8080')
     result.output.contains('Step 3/5 : COPY server.js')
   }
@@ -116,7 +135,57 @@ class OpenshiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     result.task(":tagBuild").outcome == SUCCESS
   }
 
-  def "we can deploy our image"(){
+  def "we can create a new deployment"(){
+    setup:
+    buildFile << """
+            ${basicBuildScript()}
+
+            import io.fabric8.openshift.api.model.DeploymentConfigBuilder
+            import io.fabric8.openshift.api.model.DeploymentTriggerPolicyBuilder
+
+            task createDeployment(type: com.iadams.gradle.openshift.tasks.OpenShiftCreateDeploymentTask) {
+              namespace = 'myproject'
+              deployment = new DeploymentConfigBuilder()
+                            .withNewMetadata()
+                              .withName('test-app')
+                            .endMetadata()
+                            .withNewSpec()
+                              .withReplicas(1)
+                              .withTriggers(new DeploymentTriggerPolicyBuilder().withType('ConfigChange').build())
+                              .addToSelector('app','test-app')
+                              .withNewTemplate()
+                                .withNewMetadata()
+                                  .addToLabels('app', 'test-app')
+                                .endMetadata()
+                                .withNewSpec()
+                                  .addNewContainer()
+                                    .withName('test-app')
+                                    .withImage('${registryUrl}/myproject/test-app:0.1')
+                                  .endContainer()
+                                .endSpec()
+                              .endTemplate()
+                            .endSpec()
+                            .withNewStatus()
+                              .withLatestVersion(0L)
+                            .endStatus()
+                            .build()
+            }
+            """
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withArguments('createDeployment', '--i', '--s')
+        .withPluginClasspath(pluginClasspath)
+        .withDebug(true)
+        .build()
+
+    then:
+    println result.output
+    result.task(":createDeployment").outcome == SUCCESS
+  }
+
+  def "we can trigger a new deployment of our image"(){
     setup:
     buildFile << """
             ${basicBuildScript()}

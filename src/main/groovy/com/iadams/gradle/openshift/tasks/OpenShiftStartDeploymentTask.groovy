@@ -37,6 +37,6 @@ class OpenShiftStartDeploymentTask extends AbstractOpenshiftTask {
 
   @Override
   void executeAction() {
-    client.deploymentConfigs().inNamespace(getNamespace()).withName(getDeployment()).deployLatest()
+    client.deploymentConfigs().inNamespace(getNamespace()).withName(getDeployment()).deployLatest(true)
   }
 }
