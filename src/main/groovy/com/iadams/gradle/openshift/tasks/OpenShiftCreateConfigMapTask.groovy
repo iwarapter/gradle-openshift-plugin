@@ -28,7 +28,7 @@ import org.gradle.api.InvalidUserDataException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Input
 
-class OpenShiftConfigMapTask extends AbstractOpenshiftTask {
+class OpenShiftCreateConfigMapTask extends AbstractOpenshiftTask {
 
   @Input
   String configMapName
@@ -36,7 +36,7 @@ class OpenShiftConfigMapTask extends AbstractOpenshiftTask {
   @Input
   def configMap
 
-  OpenShiftConfigMapTask() {
+  OpenShiftCreateConfigMapTask() {
     super('Tag existing images into image streams')
   }
 

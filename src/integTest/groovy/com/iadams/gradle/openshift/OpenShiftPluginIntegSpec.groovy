@@ -215,7 +215,7 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     buildFile << """
             ${basicBuildScript()}
 
-            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftConfigMapTask) {
+            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftCreateConfigMapTask) {
               namespace = 'myproject'
               configMapName = 'test-app-config1'
               configMap = file('app.properties')
@@ -242,7 +242,7 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     buildFile << """
             ${basicBuildScript()}
 
-            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftConfigMapTask) {
+            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftCreateConfigMapTask) {
               namespace = 'myproject'
               configMapName = 'test-app-config2'
               configMap = files('app.properties', 'other.properties')
@@ -270,7 +270,7 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     buildFile << """
             ${basicBuildScript()}
 
-            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftConfigMapTask) {
+            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftCreateConfigMapTask) {
               namespace = 'myproject'
               configMapName = 'test-app-config3'
               configMap = file('dir/')

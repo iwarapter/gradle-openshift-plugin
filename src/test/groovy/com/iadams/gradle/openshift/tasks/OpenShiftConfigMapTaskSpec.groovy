@@ -57,7 +57,7 @@ class OpenShiftConfigMapTaskSpec extends Specification {
         .build()).once()
 
     when:
-    OpenShiftConfigMapTask t = project.tasks.create('example', OpenShiftConfigMapTask.class)
+    OpenShiftCreateConfigMapTask t = project.tasks.create('example', OpenShiftCreateConfigMapTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
     t.configMapName = 'my-conf'
@@ -82,7 +82,7 @@ class OpenShiftConfigMapTaskSpec extends Specification {
         .build()).once()
 
     when:
-    OpenShiftConfigMapTask t = project.tasks.create('example', OpenShiftConfigMapTask.class)
+    OpenShiftCreateConfigMapTask t = project.tasks.create('example', OpenShiftCreateConfigMapTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
     t.configMapName = 'my-conf'
@@ -107,7 +107,7 @@ class OpenShiftConfigMapTaskSpec extends Specification {
         .build()).once()
 
     when:
-    OpenShiftConfigMapTask t = project.tasks.create('example', OpenShiftConfigMapTask.class)
+    OpenShiftCreateConfigMapTask t = project.tasks.create('example', OpenShiftCreateConfigMapTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
     t.configMapName = 'my-conf'
@@ -131,7 +131,7 @@ class OpenShiftConfigMapTaskSpec extends Specification {
         .build()).once()
 
     when:
-    OpenShiftConfigMapTask t = project.tasks.create('example', OpenShiftConfigMapTask.class)
+    OpenShiftCreateConfigMapTask t = project.tasks.create('example', OpenShiftCreateConfigMapTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
     t.configMapName = 'my-conf'
@@ -151,7 +151,7 @@ class OpenShiftConfigMapTaskSpec extends Specification {
 
   def "misconfigured tasks error"(){
     when:
-    OpenShiftConfigMapTask t = project.tasks.create('example', OpenShiftConfigMapTask.class)
+    OpenShiftCreateConfigMapTask t = project.tasks.create('example', OpenShiftCreateConfigMapTask.class)
     t.client = server.getOpenshiftClient()
     t.namespace = 'test'
     t.configMapName = 'my-conf'
