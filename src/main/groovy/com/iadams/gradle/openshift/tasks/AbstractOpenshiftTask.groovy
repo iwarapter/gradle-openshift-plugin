@@ -31,6 +31,7 @@ import io.fabric8.openshift.client.OpenShiftClient
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 abstract class AbstractOpenshiftTask extends DefaultTask {
@@ -39,12 +40,15 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
   String baseUrl
 
   @Input
+  @Optional
   String token
 
   @Input
+  @Optional
   String username
 
   @Input
+  @Optional
   String password
 
   @Input
@@ -71,15 +75,23 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
    * Initializes the client and performs a login preferring token > user/password
    */
   void performLogin() {
-    Config config = new ConfigBuilder()
-      .withMasterUrl(getBaseUrl())
-      .withNamespace(getNamespace())
-//      .withOauthToken(getToken())
-      .withUsername(getUsername())
-      .withPassword(getPassword())
-      .build()
+    Config config
+    if(getToken()?.trim()){ //if not null or empty
+      config = new ConfigBuilder()
+          .withMasterUrl(getBaseUrl())
+          .withNamespace(getNamespace())
+          .withOauthToken(getToken())
+          .build()
+    }
+    else {
+      config = new ConfigBuilder()
+          .withMasterUrl(getBaseUrl())
+          .withNamespace(getNamespace())
+          .withUsername(getUsername())
+          .withPassword(getPassword())
+          .build()
+    }
 
     client = new DefaultOpenShiftClient(config)
-    client.inNamespace(getNamespace())
   }
 }

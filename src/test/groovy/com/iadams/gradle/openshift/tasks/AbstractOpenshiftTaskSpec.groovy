@@ -24,6 +24,7 @@
  */
 package com.iadams.gradle.openshift.tasks
 
+import io.fabric8.openshift.client.server.mock.OpenShiftServer
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
@@ -46,17 +47,30 @@ class AbstractOpenshiftTaskSpec extends Specification {
     project.pluginManager.apply PLUGIN_ID
   }
 
-  def "PerformLogin"() {
+  def "PerformLogin with oAuth token"() {
     when:
     Example t = project.tasks.create('example', Example.class)
     t.namespace = 'my-project'
-    t.baseUrl = 'https://my-site:8443'
     t.token = '1a2b3c4d'
+    t.baseUrl = "https://my-site:8443"
 
     then:
     t.performLogin()
-    t.client != null
-    t.client.openshiftUrl.toString() == 'https://my-site:8443/oapi/v1/'
+    t.client.configuration.oauthToken == '1a2b3c4d'
+  }
+
+  def "PerformLogin with basic auth"() {
+    when:
+    Example t = project.tasks.create('example', Example.class)
+    t.namespace = 'my-project'
+    t.username = 'developer'
+    t.password = 'developer'
+    t.baseUrl = "https://my-site:8443"
+
+    then:
+    t.performLogin()
+    t.client.configuration.username == 'developer'
+    t.client.configuration.password == 'developer'
   }
 }
 

@@ -39,6 +39,7 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
   String registryUrl = ''
+  String token = ''
 
   def setup(){
     Config config = new ConfigBuilder()
@@ -50,6 +51,7 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     OpenShiftClient client = new DefaultOpenShiftClient(config)
     Service svc = client.services().inNamespace('default').withName('docker-registry').get()
     registryUrl = "${svc.spec.clusterIP}:${svc.spec.ports[0].targetPort.intVal}"
+    token = client.configuration.getOauthToken()
     client.close()
   }
 
@@ -387,9 +389,7 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
         openshift {
           baseUrl = 'https://127.0.0.1:8443'
           auth {
-            token = 'GrB-ybUVCtDe0BVDm04WhdjvvRKvXfsl2pVEp_KL-SY'
-            username = 'developer'
-            password = 'developer'
+            token = '$token'
           }
         }"""
   }

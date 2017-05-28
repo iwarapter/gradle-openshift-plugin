@@ -42,11 +42,14 @@ class OpenShiftTagTask extends AbstractOpenshiftTask {
   void executeAction() {
     client.imageStreamTags().createOrReplaceWithNew()
       .withNewMetadata()
-      .withName("${getImageName()}:${getTag()}")
-      .and()
-      .withNewTag().withNewFrom().withKind('DockerImage').withName("${getImageName()}:latest")
-      .and()
-      .and()
+        .withName("${getImageName()}:${getTag()}")
+      .endMetadata()
+      .withNewTag()
+        .withNewFrom()
+          .withKind('DockerImage')
+          .withName("${getImageName()}:latest")
+        .endFrom()
+      .endTag()
       .done()
   }
 }
