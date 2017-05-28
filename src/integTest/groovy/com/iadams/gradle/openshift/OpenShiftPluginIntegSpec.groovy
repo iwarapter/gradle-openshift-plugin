@@ -209,6 +209,89 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     result.task(":deploy").outcome == SUCCESS
   }
 
+  def "we can create a configMap with a single file"(){
+    setup:
+
+    buildFile << """
+            ${basicBuildScript()}
+
+            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftConfigMapTask) {
+              namespace = 'myproject'
+              configMapName = 'test-app-config1'
+              configMap = file('app.properties')
+            }
+            """
+    copyResources('app.properties', 'app.properties')
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withArguments('createConfig', '--i', '--s')
+        .withPluginClasspath(pluginClasspath)
+        .withDebug(true)
+        .build()
+
+    then:
+    println result.output
+    result.task(":createConfig").outcome == SUCCESS
+  }
+
+  def "we can create a configMap with a series of files"(){
+    setup:
+
+    buildFile << """
+            ${basicBuildScript()}
+
+            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftConfigMapTask) {
+              namespace = 'myproject'
+              configMapName = 'test-app-config2'
+              configMap = files('app.properties', 'other.properties')
+            }
+            """
+    copyResources('app.properties', 'app.properties')
+    copyResources('other.properties', 'other.properties')
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withArguments('createConfig', '--i', '--s')
+        .withPluginClasspath(pluginClasspath)
+        .withDebug(true)
+        .build()
+
+    then:
+    println result.output
+    result.task(":createConfig").outcome == SUCCESS
+  }
+
+  def "we can create a configMap with a directory"(){
+    setup:
+
+    buildFile << """
+            ${basicBuildScript()}
+
+            task createConfig(type: com.iadams.gradle.openshift.tasks.OpenShiftConfigMapTask) {
+              namespace = 'myproject'
+              configMapName = 'test-app-config3'
+              configMap = file('dir/')
+            }
+            """
+    copyResources('app.properties', 'dir/app.properties')
+    copyResources('other.properties', 'dir/other.properties')
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withArguments('createConfig', '--i', '--s')
+        .withPluginClasspath(pluginClasspath)
+        .withDebug(true)
+        .build()
+
+    then:
+    println result.output
+    result.task(":createConfig").outcome == SUCCESS
+  }
+
   def basicBuildScript(){
     """ plugins {
           id 'com.iadams.openshift'

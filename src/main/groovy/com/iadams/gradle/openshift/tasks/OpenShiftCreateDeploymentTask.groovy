@@ -39,7 +39,7 @@ class OpenShiftCreateDeploymentTask extends AbstractOpenshiftTask {
 
   @Override
   void executeAction() {
-    switch (deployment) {
+    switch (getDeployment()) {
       case File:
         File f = (File) getDeployment()
         client.load(f.newInputStream()).createOrReplace()
