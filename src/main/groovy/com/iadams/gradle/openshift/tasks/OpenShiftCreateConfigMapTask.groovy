@@ -74,7 +74,5 @@ class OpenShiftCreateConfigMapTask extends AbstractOpenshiftTask {
       default:
         throw new InvalidUserDataException("Unable to create configMap with object ${getConfigMap().class}")
     }
-    client.configMaps().withName(getConfigMapName()).createOrReplaceWithNew()
-
   }
 }
