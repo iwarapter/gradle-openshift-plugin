@@ -292,6 +292,90 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     result.task(":createConfig").outcome == SUCCESS
   }
 
+
+  def "we can create a secret with a single file"(){
+    setup:
+
+    buildFile << """
+            ${basicBuildScript()}
+
+            task createSecret(type: com.iadams.gradle.openshift.tasks.OpenShiftCreateSecretTask) {
+              namespace = 'myproject'
+              secretName = 'test-app-config1'
+              secret = file('app.properties')
+            }
+            """
+    copyResources('app.properties', 'app.properties')
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withArguments('createSecret', '--i', '--s')
+        .withPluginClasspath(pluginClasspath)
+        .withDebug(true)
+        .build()
+
+    then:
+    println result.output
+    result.task(":createSecret").outcome == SUCCESS
+  }
+
+  def "we can create a secret with a series of files"(){
+    setup:
+
+    buildFile << """
+            ${basicBuildScript()}
+
+            task createSecret(type: com.iadams.gradle.openshift.tasks.OpenShiftCreateSecretTask) {
+              namespace = 'myproject'
+              secretName = 'test-app-config2'
+              secret = files('app.properties', 'other.properties')
+            }
+            """
+    copyResources('app.properties', 'app.properties')
+    copyResources('other.properties', 'other.properties')
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withArguments('createSecret', '--i', '--s')
+        .withPluginClasspath(pluginClasspath)
+        .withDebug(true)
+        .build()
+
+    then:
+    println result.output
+    result.task(":createSecret").outcome == SUCCESS
+  }
+
+  def "we can create a secret with a directory"(){
+    setup:
+
+    buildFile << """
+            ${basicBuildScript()}
+
+            task createSecret(type: com.iadams.gradle.openshift.tasks.OpenShiftCreateSecretTask) {
+              namespace = 'myproject'
+              secretName = 'test-app-config3'
+              secret = file('dir/')
+            }
+            """
+    copyResources('app.properties', 'dir/app.properties')
+    copyResources('other.properties', 'dir/other.properties')
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withArguments('createSecret', '--i', '--s')
+        .withPluginClasspath(pluginClasspath)
+        .withDebug(true)
+        .build()
+
+    then:
+    println result.output
+    result.task(":createSecret").outcome == SUCCESS
+  }
+
   def basicBuildScript(){
     """ plugins {
           id 'com.iadams.openshift'
