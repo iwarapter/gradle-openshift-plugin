@@ -24,5 +24,6 @@ script:
   # run tests
   - docker version
   - oc version
+  - chmod +x oc-cluster-up.sh
   - ./oc-cluster-up.sh
   - ./gradlew clean build integTest
