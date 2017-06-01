@@ -1,10 +1,21 @@
 sudo: required
 
 language:
-  - bash
+  - java
 
 services:
   - docker
+
+jdk:
+  - oraclejdk8
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 before_install:
   # openshift
@@ -13,12 +24,14 @@ before_install:
   - sudo mv /bin/findmnt /bin/findmnt.backup
   - sudo cat /etc/default/docker
   - sudo /etc/init.d/docker restart
-  - wget https://github.com/openshift/origin/releases/download/v1.4.1/openshift-origin-client-tools-v1.4.1-3f9807a-linux-64bit.tar.gz -O /tmp/oc.tar.gz
-  - mkdir /tmp/ocdir && cd /tmp/ocdir && tar -xvvf /tmp/oc.tar.gz
+  - wget https://github.com/openshift/origin/releases/download/v1.3.3/openshift-origin-client-tools-v1.3.3-bc17c1527938fa03b719e1a117d584442e3727b8-linux-64bit.tar.gz -O /tmp/oc.tar.gz
+  - mkdir /tmp/ocdir && tar -C /tmp/ocdir -xvvf /tmp/oc.tar.gz
   - sudo mv /tmp/ocdir/*/oc /usr/bin/
 
 script:
   # run tests
   - docker version
   - oc version
-  - oc cluster up
+  - chmod +x oc-cluster-up.sh
+  - ./oc-cluster-up.sh
+  - ./gradlew build integTest

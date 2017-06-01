@@ -107,9 +107,9 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
     println result.output
     result.task(":startBuild").outcome == SUCCESS
     result.output.contains('Receiving source from STDIN as archive ...')
-    result.output.contains('Step 1/5 : FROM node:6.10.3-alpine')
-    result.output.contains('Step 2/5 : EXPOSE 8080')
-    result.output.contains('Step 3/5 : COPY server.js')
+    result.output.contains(' : FROM node:6.10.3-alpine')
+    result.output.contains(' : EXPOSE 8080')
+    result.output.contains(' : COPY server.js')
   }
 
   def "we can tag a built image"() {
