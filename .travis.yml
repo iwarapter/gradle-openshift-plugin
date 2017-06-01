@@ -1,11 +1,14 @@
 sudo: required
 
 language:
-  - bash
+  - java
 
 services:
   - docker
 
+jdk:
+  - oraclejdk8
+  
 before_install:
   # openshift
   - sudo apt-get install wget -y
