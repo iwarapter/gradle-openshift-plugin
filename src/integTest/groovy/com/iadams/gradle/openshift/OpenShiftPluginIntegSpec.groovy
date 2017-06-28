@@ -74,6 +74,7 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
       .withArguments('startBuild', '--i', '--s')
       .withPluginClasspath(pluginClasspath)
       .withDebug(true)
+      .withGradleVersion(gradleVersion())
       .build()
 
     then:
@@ -101,6 +102,7 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
       .withArguments('startBuild', '--i', '--s')
       .withPluginClasspath(pluginClasspath)
       .withDebug(true)
+      .withGradleVersion(gradleVersion())
       .build()
 
     then:
@@ -126,11 +128,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-            .withProjectDir(testProjectDir.root)
-            .withArguments('tagBuild', '--i', '--s')
-            .withPluginClasspath(pluginClasspath)
-            .withDebug(true)
-            .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('tagBuild', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output
@@ -176,11 +179,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments('createDeployment', '--i', '--s')
-        .withPluginClasspath(pluginClasspath)
-        .withDebug(true)
-        .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('createDeployment', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output
@@ -200,11 +204,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments('deploy', '--i', '--s')
-        .withPluginClasspath(pluginClasspath)
-        .withDebug(true)
-        .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('deploy', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output
@@ -227,11 +232,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments('createConfig', '--i', '--s')
-        .withPluginClasspath(pluginClasspath)
-        .withDebug(true)
-        .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('createConfig', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output
@@ -255,11 +261,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments('createConfig', '--i', '--s')
-        .withPluginClasspath(pluginClasspath)
-        .withDebug(true)
-        .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('createConfig', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output
@@ -283,11 +290,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments('createConfig', '--i', '--s')
-        .withPluginClasspath(pluginClasspath)
-        .withDebug(true)
-        .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('createConfig', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output
@@ -311,11 +319,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments('createSecret', '--i', '--s')
-        .withPluginClasspath(pluginClasspath)
-        .withDebug(true)
-        .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('createSecret', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output
@@ -339,11 +348,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments('createSecret', '--i', '--s')
-        .withPluginClasspath(pluginClasspath)
-        .withDebug(true)
-        .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('createSecret', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output
@@ -367,11 +377,12 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
     when:
     def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments('createSecret', '--i', '--s')
-        .withPluginClasspath(pluginClasspath)
-        .withDebug(true)
-        .build()
+      .withProjectDir(testProjectDir.root)
+      .withArguments('createSecret', '--i', '--s')
+      .withPluginClasspath(pluginClasspath)
+      .withDebug(true)
+      .withGradleVersion(gradleVersion())
+      .build()
 
     then:
     println result.output

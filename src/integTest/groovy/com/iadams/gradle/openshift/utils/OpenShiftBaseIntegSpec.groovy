@@ -53,6 +53,10 @@ class OpenShiftBaseIntegSpec extends Specification {
 
   }
 
+  def gradleVersion(){
+    return System.getenv('GRADLE_VERSION') != null ? System.getenv('GRADLE_VERSION') : '3.5'
+  }
+
   /**
    * Copy a given set of files/directories
    *
