@@ -33,7 +33,8 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 class OpenShiftStartDeploymentTaskSpec extends Specification {
-  static final String PLUGIN_ID = 'com.iadams.openshift'
+
+  static final String PLUGIN_ID = 'com.iadams.openshift-base'
   Project project
 
   @Rule

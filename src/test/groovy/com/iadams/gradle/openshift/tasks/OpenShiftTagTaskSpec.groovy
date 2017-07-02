@@ -34,7 +34,7 @@ import spock.lang.Specification
 
 class OpenShiftTagTaskSpec extends Specification {
 
-  static final String PLUGIN_ID = 'com.iadams.openshift'
+  static final String PLUGIN_ID = 'com.iadams.openshift-base'
   Project project
 
   @Rule

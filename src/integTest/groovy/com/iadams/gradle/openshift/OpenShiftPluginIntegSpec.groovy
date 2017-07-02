@@ -380,7 +380,7 @@ class OpenShiftPluginIntegSpec extends OpenShiftBaseIntegSpec {
 
   def basicBuildScript(){
     """ plugins {
-          id 'com.iadams.openshift'
+          id 'com.iadams.openshift-base'
         }
 
         group = 'com.example'
