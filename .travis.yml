@@ -1,13 +1,10 @@
 sudo: required
 
 language:
-  - java
+  - bash
 
 services:
   - docker
-
-jdk:
-  - oraclejdk8
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -17,14 +14,21 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-before_install:
+
+before_install:  
+  - sudo sh -c 'echo "deb https://apt.dockerproject.org/repo ubuntu-precise main" > /etc/apt/sources.list.d/docker.list'
+  - sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+  - echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
+  - sudo add-apt-repository ppa:webupd8team/java -y && sudo apt-get update && sudo apt-get install oracle-java8-installer -y
+  - sudo apt-key update
+  - sudo apt-get -qqy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine=1.11.1-0~precise
   # openshift
   - sudo apt-get install wget -y
   - sudo sed -i 's:DOCKER_OPTS=":DOCKER_OPTS="--insecure-registry 172.30.0.0/16 :g' /etc/default/docker
   - sudo mv /bin/findmnt /bin/findmnt.backup
   - sudo cat /etc/default/docker
   - sudo /etc/init.d/docker restart
-  - wget https://github.com/openshift/origin/releases/download/v1.3.3/openshift-origin-client-tools-v1.3.3-bc17c1527938fa03b719e1a117d584442e3727b8-linux-64bit.tar.gz -O /tmp/oc.tar.gz
+  - wget https://github.com/openshift/origin/releases/download/v1.4.1/openshift-origin-client-tools-v1.4.1-3f9807a-linux-64bit.tar.gz -O /tmp/oc.tar.gz
   - mkdir /tmp/ocdir && tar -C /tmp/ocdir -xvvf /tmp/oc.tar.gz
   - sudo mv /tmp/ocdir/*/oc /usr/bin/
 
@@ -35,3 +39,12 @@ script:
   - chmod +x oc-cluster-up.sh
   - ./oc-cluster-up.sh
   - ./gradlew build integTest
+
+env:
+  - GRADLE_VERSION=3.0
+  - GRADLE_VERSION=3.1
+  - GRADLE_VERSION=3.2
+  - GRADLE_VERSION=3.3
+  - GRADLE_VERSION=3.4
+  - GRADLE_VERSION=3.5
+  - GRADLE_VERSION=4.0
