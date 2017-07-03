@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.iadams.gradle'
-version '0.1-SNAPSHOT'
+version '0.1-RC1'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -40,3 +40,17 @@ task integTestTarBall(type: Tar) {
 }
 
 processIntegTestResources.dependsOn integTestTarBall
+
+pluginBundle {
+  website = 'https://github.com/iwarapter/gradle-openshift-plugin'
+  vcsUrl = 'https://github.com/iwarapter/gradle-openshift-plugin'
+  description = 'Plugin for integrating with OpenShift.'
+  tags = ['openshift']
+
+  plugins {
+    openshiftPlugin {
+      id = 'com.iadams.openshift-base'
+      displayName = 'Gradle OpenShift Plugin'
+    }
+  }
+}
