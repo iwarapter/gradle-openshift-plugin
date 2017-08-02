@@ -47,6 +47,7 @@ class OpenshiftPlugin implements Plugin<Project> {
     project.tasks.withType(AbstractOpenshiftTask) {
       conventionMapping.baseUrl = {extension.baseUrl}
       conventionMapping.namespace = {extension.namespace}
+      conventionMapping.trustCerts = {extension.trustCerts}
       conventionMapping.token = {extension.auth.token}
       conventionMapping.username = {extension.auth.username}
       conventionMapping.password = {extension.auth.password}

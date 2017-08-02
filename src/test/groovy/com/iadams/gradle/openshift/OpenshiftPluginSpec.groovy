@@ -67,12 +67,14 @@ class OpenshiftPluginSpec extends Specification {
     ext.auth.username = 'woot'
     ext.auth.password = 'woot'
     ext.auth.token = 'woot'
+    ext.trustCerts = true
 
     then:
     noExceptionThrown()
     ext.auth.username == 'woot'
     ext.auth.password == 'woot'
     ext.auth.token == 'woot'
+    ext.trustCerts == true
   }
 
   def 'apply does not throw exceptions'() {

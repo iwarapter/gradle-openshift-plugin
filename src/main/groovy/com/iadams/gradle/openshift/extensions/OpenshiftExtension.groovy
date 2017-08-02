@@ -33,5 +33,5 @@ class OpenshiftExtension {
 
   String namespace
 
-
+  boolean trustCerts
 }
