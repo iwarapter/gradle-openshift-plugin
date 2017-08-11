@@ -71,6 +71,23 @@ class AbstractOpenshiftTaskSpec extends Specification {
     t.performLogin()
     t.client.configuration.username == 'developer'
     t.client.configuration.password == 'developer'
+    t.client.configuration.trustCerts == false
+  }
+
+  def "PerformLogin with basic auth and disable cert verification"() {
+    when:
+    Example t = project.tasks.create('example', Example.class)
+    t.namespace = 'my-project'
+    t.username = 'developer'
+    t.password = 'developer'
+    t.baseUrl = "https://my-site:8443"
+    t.trustCerts = true
+
+    then:
+    t.performLogin()
+    t.client.configuration.username == 'developer'
+    t.client.configuration.password == 'developer'
+    t.client.configuration.trustCerts == true
   }
 }
 

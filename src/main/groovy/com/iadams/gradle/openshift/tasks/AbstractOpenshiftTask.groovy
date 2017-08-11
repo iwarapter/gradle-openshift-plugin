@@ -52,6 +52,10 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
   String password
 
   @Input
+  @Optional
+  boolean trustCerts
+
+  @Input
   String namespace
 
   @Internal
@@ -79,6 +83,7 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
     if(getToken()?.trim()){ //if not null or empty
       config = new ConfigBuilder()
           .withMasterUrl(getBaseUrl())
+          .withTrustCerts(isTrustCerts())
           .withNamespace(getNamespace())
           .withOauthToken(getToken())
           .build()
@@ -86,6 +91,7 @@ abstract class AbstractOpenshiftTask extends DefaultTask {
     else {
       config = new ConfigBuilder()
           .withMasterUrl(getBaseUrl())
+          .withTrustCerts(isTrustCerts())
           .withNamespace(getNamespace())
           .withUsername(getUsername())
           .withPassword(getPassword())
